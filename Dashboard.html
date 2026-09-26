@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Dashboard</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:sans-serif}
+body{background:#f6f7fb;display:flex;min-height:100vh}
+.sidebar{width:230px;background:#fff;border-right:1px solid #eee;padding:20px;display:flex;flex-direction:column}
+.logo{font-weight:800;font-size:20px;margin-bottom:30px}
+.menu a{display:block;padding:12px 14px;border-radius:10px;color:#555;text-decoration:none;margin-bottom:6px;font-size:14px}
+.menu a.active{background:#e8e0ff;color:#6c5ce7;font-weight:700}
+.main{flex:1;padding:24px}
+.top{display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+.top h1{font-size:22px}
+.badge{background:#fff;padding:8px 12px;border-radius:20px;border:1px solid #eee;font-size:12px}
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:16px;margin-top:20px}
+.card{background:#fff;padding:20px;border-radius:16px;box-shadow:0 4px 20px rgba(0,0,0,.05)}
+.card h3{font-size:12px;color:#777} .card b{font-size:24px;display:block;margin-top:6px}
+.activity{background:#fff;margin-top:20px;padding:20px;border-radius:16px}
+.activity li{list-style:none;padding:10px 0;border-bottom:1px solid #f0f0f0;font-size:13px}
+.logout{margin-top:auto;padding:12px;border:1px solid #ddd;border-radius:10px;background:#fff;cursor:pointer}
+</style>
+</head>
+<body>
+
+<div class="sidebar">
+<div class="logo">◍ YourBrand</div>
+<div class="menu">
+<a class="active">Dashboard</a>
+<a>Projects</a>
+<a>Settings</a>
+</div>
+<button class="logout" id="logoutBtn">Logout</button>
+<div style="margin-top:16px;display:flex;gap:10px;align-items:center">
+<div style="width:36px;height:36px;background:#6c5ce7;color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700" id="avatar">JD</div>
+<div><div style="font-size:13px;font-weight:700" id="userName">Loading...</div><div style="font-size:11px;color:#777" id="userEmail">...</div></div>
+</div>
+</div>
+
+<div class="main">
+<div class="top">
+<div>
+<h1 id="welcome">Welcome back, </h1>
+<p style="font-size:13px;color:#777;margin-top:4px">Here's your activity today • <span id="date"></span></p>
+</div>
+<div class="badge">✅ Logged in with Gmail</div>
+</div>
+
+<div class="cards">
+<div class="card"><h3>Total Revenue</h3><b>$24,580</b><span style="color:green;font-size:12px">↑ 12.5% vs last month</span></div>
+<div class="card"><h3>Active Users</h3><b>1,243</b><span style="color
