@@ -2,93 +2,89 @@
 <html>
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>My Notes - Data Server</title>
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>My Server - Notes</title>
 <style>
-*{margin:0;padding:0;box-sizing:border-box;font-family:sans-serif}
-body{background:#f5f3ff;padding:20px;min-height:100vh}
-.top{max-width:600px;margin:0 auto 20px;display:flex;justify-content:space-between;align-items:center}
-.card{max-width:600px;margin:0 auto;background:#fff;padding:20px;border-radius:16px;box-shadow:0 8px 20px rgba(0,0,0,.06);margin-bottom:16px}
-textarea{width:100%;height:120px;padding:14px;border:1.5px solid #ddd;border-radius:12px;outline:none;resize:none}
+*{box-sizing:border-box;font-family:sans-serif;margin:0;padding:0}
+body{background:#f0eaff;padding:16px;min-height:100vh}
+.top{max-width:600px;margin:0 auto 12px;display:flex;justify-content:space-between;align-items:center}
+.badge{background:#6c5ce7;color:#fff;font-size:10px;padding:5px 10px;border-radius:20px}
+.card{max-width:600px;margin:0 auto 14px;background:#fff;padding:18px;border-radius:16px;box-shadow:0 6px 16px rgba(0,0,0,.07)}
+textarea{width:100%;height:110px;padding:12px;border:1.5px solid #ddd;border-radius:10px;outline:none;resize:none}
 textarea:focus{border-color:#6c5ce7}
-.btn{width:100%;padding:13px;margin-top:12px;background:#6c5ce7;color:#fff;border:none;border-radius:10px;font-weight:700;cursor:pointer}
-.note{background:#f9f8ff;padding:12px;border-radius:10px;margin-top:10px;border:1px solid #eee}
-.small{font-size:11px;color:#888;margin-top:6px}
-#status{font-size:13px;margin-top:10px;text-align:center}
+.btn{width:100%;padding:12px;background:#6c5ce7;color:#fff;border:0;border-radius:10px;font-weight:700;margin-top:10px;cursor:pointer}
+.btn:active{transform:scale(.98)}
+.note{background:#f8f7ff;border:1px solid #eee;padding:12px;border-radius:10px;margin-top:8px;word-break:break-word}
+.small{font-size:10px;color:#888;margin-top:4px}
+#s{font-size:13px;text-align:center;margin-top:8px}
 </style>
 </head>
 <body>
-
 <div class="top">
-<h2>📝 My Notes</h2>
-<span style="font-size:12px;background:#e8e0ff;padding:6px 12px;border-radius:20px">Server: data-da9a1</span>
+<h3>📝 My Notes App</h3>
+<span class="badge">data-da9a1 LIVE</span>
 </div>
 
 <div class="card">
-<h3 style="font-size:14px;margin-bottom:10px">Write a new note</h3>
-<textarea id="noteInput" placeholder="Type anything... your note will be saved on YOUR server"></textarea>
-<button class="btn" id="saveBtn">Save to My Server</button>
-<p id="status"></p>
+<h4 style="margin-bottom:8px">Write something</h4>
+<textarea id="t" placeholder="Type anything... then click Save. It will be saved on YOUR Firebase server"></textarea>
+<button class="btn" id="b">Save to My Server Storage</button>
+<p id="s"></p>
 </div>
 
 <div class="card">
-<h3 style="font-size:14px;margin-bottom:10px">Saved on Server (you can see here + in Firebase)</h3>
-<div id="notesList">Loading your server data...</div>
+<h4>📦 Saved on Your Server (data-da9a1)</h4>
+<div id="list" style="margin-top:10px">Connecting to server...</div>
 </div>
 
 <script type="module">
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-// YOUR SERVER CONFIG - You need to get apiKey from Project Settings
 const firebaseConfig = {
-  apiKey: "YOUR_API_KEY_HERE - GET FROM PROJECT SETTINGS",
+  apiKey: "AIzaSyBT9YyuTs4p-wOxz5i8awNjeI3nLXOB2Lc",
   authDomain: "data-da9a1.firebaseapp.com",
   projectId: "data-da9a1",
-  storageBucket: "data-da9a1.appspot.com",
-  messagingSenderId: "YOUR_ID",
-  appId: "YOUR_APP_ID"
+  storageBucket: "data-da9a1.firebasestorage.app",
+  messagingSenderId: "921746768770",
+  appId: "1:921746768770:web:e327ac06fc67822fa4059b",
+  measurementId: "G-2ZMEFEQJNN"
 };
 
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-const input = document.getElementById('noteInput');
-const status = document.getElementById('status');
-const list = document.getElementById('notesList');
+const t = document.getElementById('t');
+const s = document.getElementById('s');
+const list = document.getElementById('list');
+const b = document.getElementById('b');
 
-// SAVE BUTTON
-document.getElementById('saveBtn').onclick = async () => {
-  const text = input.value.trim();
-  if(!text) return alert("Write something first");
-  status.textContent="Saving to data-da9a1...";
+b.onclick = async()=>{
+  const text=t.value.trim();
+  if(!text)return alert("Write something first");
+  s.textContent="Saving to data-da9a1..."; s.style.color="#666";
   try{
-    await addDoc(collection(db, "secret_notes"), {
-      message: text,
-      created: serverTimestamp()
-    });
-    input.value="";
-    status.textContent="✅ Saved on YOUR server!";
-    status.style.color="green";
-  }catch(e){
-    status.textContent="❌ "+e.message;
-    status.style.color="red";
-    // If error about permission, tell them to fix rules
-    if(e.message.includes("permission")) {
-      alert("Go to Firestore > Rules tab > set to 'allow read, write: if true;' for testing");
-    }
+    await addDoc(collection(db,"secret_notes"),{message:text,created:serverTimestamp()});
+    t.value=""; 
+    s.textContent="✅ Saved on YOUR server! Check Firebase console also."; 
+    s.style.color="green";
+  }catch(e){ 
+    s.textContent="❌ "+e.message; 
+    s.style.color="red";
+    if(e.message.includes("permission")) alert("Go to Firebase > Firestore > Rules > set allow read, write: if true; and Publish");
   }
 };
 
-// AUTO SHOW ALL NOTES FROM SERVER
-const q = query(collection(db, "secret_notes"), orderBy("created","desc"));
-onSnapshot(q, (snap)=>{
-  let html="";
+const q=query(collection(db,"secret_notes"),orderBy("created","desc"));
+onSnapshot(q,(snap)=>{
+  if(snap.empty){ list.innerHTML="No notes yet. Write one above."; return; }
+  let h="";
   snap.forEach(doc=>{
-    const d = doc.data();
-    html+=`<div class="note">${d.message}<div class="small">${d.created?.toDate().toLocaleString()||'just now'}</div></div>`;
+    const d=doc.data();
+    const time = d.created ? d.created.toDate().toLocaleString() : "just now";
+    h+=`<div class="note">${d.message}<div class="small">${time} | ID: ${doc.id.substring(0,6)}</div></div>`;
   });
-  list.innerHTML = html || "No notes yet on server";
+  list.innerHTML=h;
 });
 </script>
 </body>
