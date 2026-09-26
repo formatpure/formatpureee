@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Login - Pro</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:sans-serif}
+body{min-height:100vh;display:flex;background:#f5f3ff}
+.left{width:50%;background:#6c5ce7;color:#fff;padding:40px;display:flex;flex-direction:column;justify-content:center}
+.left h1{font-size:36px;line-height:1.2}
+.right{width:50%;display:flex;align-items:center;justify-content:center;padding:20px;background:#f5f3ff}
+.card{background:#fff;width:100%;max-width:400px;padding:32px;border-radius:20px;box-shadow:0 15px 40px rgba(0,0,0,.08)}
+h2{font-size:26px} .sub{color:#777;font-size:13px;margin:6px 0 22px}
+input{width:100%;padding:13px;border:1.5px solid #e5e7eb;border-radius:10px;margin-top:6px;margin-bottom:14px;outline:none}
+input:focus{border-color:#6c5ce7}
+.btn{width:100%;padding:13px;background:#6c5ce7;color:#fff;border:none;border-radius:10px;font-weight:700;cursor:pointer}
+.btn:disabled{opacity:.6}
+.gbtn{width:100%;padding:12px;border:1.5px solid #ddd;background:#fff;border-radius:10px;font-weight:600;margin-top:12px;cursor:pointer}
+.divider{text-align:center;color:#aaa;font-size:12px;margin:16px 0}
+#msg{font-size:12px;margin-top:10px;text-align:center}
+@media(max-width:800px){.left{display:none}.right{width:100%}}
+</style>
+</head>
+<body>
+<div class="left">
+<h1>Welcome back.<br>We missed you.</h1>
+<p style="margin-top:12px;opacity:.9">Secure login with Gmail. Professional grade.</p>
+</div>
+<div class="right">
+<div class="card">
+<h2>Log in</h2>
+<p class="sub">Use your Gmail and password</p>
+
+<label style="font-size:12px;font-weight:700">Gmail</label>
+<input type="email" id="email" placeholder="you@gmail.com">
+
+<label style="font-size:12px;font-weight:700">Password</label>
+<input type="password" id="password" placeholder="••••••••">
+
+<button class="btn" id="loginBtn">Log in</button>
+<button class="gbtn" id="googleBtn">Continue with Google</button>
+
+<p id="msg"></p>
+<p style="text-align:center;font-size:12px;margin-top:14px">Don't have account? <a href="#" id="signupLink" style="color:#6c5ce7;font-weight:700;text-decoration:none">Sign up</a></p>
+</div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signInWithPopup, GoogleAuthProvider } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-auth.js";
+
+// 1. PASTE YOUR FIREBASE CONFIG HERE
+const firebaseConfig = {
+  apiKey: "YOUR_API_KEY",
+  authDomain: "YOUR_PROJECT.firebaseapp.com",
+  projectId: "YOUR_PROJECT_ID",
+  appId: "YOUR_APP_ID"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const provider = new GoogleAuthProvider();
+
+const email = document.getElementById('email');
+const password = document.getElementById('password');
+const msg = document.getElementById('msg');
+
+document.getElementById('loginBtn').onclick = async () => {
+  msg.textContent="Logging in...";
+  try{
+    await signInWithEmailAndPassword(auth, email.value, password.value);
+    msg.textContent="✅ Login Success! Gmail: "+auth.currentUser.email;
+    msg.style.color="green";
+  }catch(e){
+   
