@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>My Notes - Data Server</title>
+<style>
+*{margin:0;padding:0;box-sizing:border-box;font-family:sans-serif}
+body{background:#f5f3ff;padding:20px;min-height:100vh}
+.top{max-width:600px;margin:0 auto 20px;display:flex;justify-content:space-between;align-items:center}
+.card{max-width:600px;margin:0 auto;background:#fff;padding:20px;border-radius:16px;box-shadow:0 8px 20px rgba(0,0,0,.06);margin-bottom:16px}
+textarea{width:100%;height:120px;padding:14px;border:1.5px solid #ddd;border-radius:12px;outline:none;resize:none}
+textarea:focus{border-color:#6c5ce7}
+.btn{width:100%;padding:13px;margin-top:12px;background:#6c5ce7;color:#fff;border:none;border-radius:10px;font-weight:700;cursor:pointer}
+.note{background:#f9f8ff;padding:12px;border-radius:10px;margin-top:10px;border:1px solid #eee}
+.small{font-size:11px;color:#888;margin-top:6px}
+#status{font-size:13px;margin-top:10px;text-align:center}
+</style>
+</head>
+<body>
+
+<div class="top">
+<h2>📝 My Notes</h2>
+<span style="font-size:12px;background:#e8e0ff;padding:6px 12px;border-radius:20px">Server: data-da9a1</span>
+</div>
+
+<div class="card">
+<h3 style="font-size:14px;margin-bottom:10px">Write a new note</h3>
+<textarea id="noteInput" placeholder="Type anything... your note will be saved on YOUR server"></textarea>
+<button class="btn" id="saveBtn">Save to My Server</button>
+<p id="status"></p>
+</div>
+
+<div class="card">
+<h3 style="font-size:14px;margin-bottom:10px">Saved on Server (you can see here + in Firebase)</h3>
+<div id="notesList">Loading your server data...</div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { getFirestore, collection, addDoc, onSnapshot, query, orderBy, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+
+// YOUR SERVER CONFIG - You need to get apiKey from Project Settings
+const firebaseConfig = {
+  apiKey: "YOUR_API_KEY_HERE - GET FROM PROJECT SETTINGS",
+  authDomain: "data-da9a1.firebaseapp.com",
+  projectId: "data-da9a1",
+  storageBucket: "data-da9a1.appspot.com",
+  messagingSenderId: "YOUR_ID",
+  appId: "YOUR_APP_ID"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
+const input = document.getElementById('noteInput');
+const status = document.getElementById('status');
+const list = document.getElementById('notesList');
+
+// SAVE BUTTON
+document.getElementById('saveBtn').onclick = async () => {
+  const text = input.value.trim();
+  if(!text) return alert("Write something first");
+  status.textContent="Saving to data-da9a1...";
+  try{
+    await addDoc(collection(db, "secret_notes"), {
+      message: text,
+      created: serverTimestamp()
+    });
+    input.value="";
+    status.textContent="✅ Saved on YOUR server!";
+    status.style.color="green";
+  }catch(e){
+    status.textContent="❌ "+e.message;
+    status.style.color="red";
+    // If error about permission, tell them to fix rules
+    if(e.message.includes("permission")) {
+      alert("Go to Firestore > Rules tab > set to 'allow read, write: if true;' for testing");
+    }
+  }
+};
+
+// AUTO SHOW ALL NOTES FROM SERVER
+const q = query(collection(db, "secret_notes"), orderBy("created","desc"));
+onSnapshot(q, (snap)=>{
+  let html="";
+  snap.forEach(doc=>{
+    const d = doc.data();
+    html+=`<div class="note">${d.message}<div class="small">${d.created?.toDate().toLocaleString()||'just now'}</div></div>`;
+  });
+  list.innerHTML = html || "No notes yet on server";
+});
+</script>
+</body>
+</html>
